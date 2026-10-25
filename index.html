@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I.N.E.F.F.A.</title>
+  
+  <!-- Browser Tab Favicon -->
+  <link rel="icon" type="image/png" href="https://static.wikia.nocookie.net/gensin-impact/images/3/3f/Ineffa_TCG_Avatar_Icon.png/revision/latest/scale-to-width-down/250?cb=20260306003556">
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PDF.js for in-browser PDF parsing -->
@@ -56,7 +60,9 @@
     /* Video Center-Crop for Portrait Left Panel */
     .video-ineffa-crop {
       object-fit: cover;
-      object-position: center 30%;
+      object-position: center 65%;
+      transform: scale(1.22);
+      transform-origin: center 60%;
       width: 100%;
       height: 100%;
     }
@@ -87,6 +93,11 @@
     <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/90 backdrop-blur-[2px]"></div>
 
     <div class="relative z-10 flex items-center gap-3">
+      <!-- Ineffa TCG Avatar Icon next to Title -->
+      <img src="https://static.wikia.nocookie.net/gensin-impact/images/3/3f/Ineffa_TCG_Avatar_Icon.png/revision/latest/scale-to-width-down/250?cb=20260306003556" 
+           alt="Ineffa Avatar" 
+           referrerpolicy="no-referrer"
+           class="w-9 h-9 rounded-full object-cover border border-indigo-500/50 shadow-md" />
       <div>
         <h1 class="font-bold text-base tracking-wide text-zinc-100 flex items-center gap-2">
           I.N.E.F.F.A.
@@ -551,7 +562,7 @@ PARAMETER temperature 0.2`
       }
     };
 
-    // Chat Handler with Guaranteed Recovery & Explicit Error Handling
+    // Chat Handler with Updated gemini-3.8-flash Endpoint
     chatForm.onsubmit = async (e) => {
       e.preventDefault();
       const question = userInput.value.trim();
@@ -596,7 +607,8 @@ ${question}
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        // Updated directly to gemini-3.8-flash endpoint
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           signal: controller.signal,
           headers: { 'Content-Type': 'application/json' },
@@ -638,12 +650,12 @@ ${question}
         bubble.innerHTML = htmlContent;
         wrapper.appendChild(bubble);
       } else {
-        // Ineffa Flipped Chat Avatar
+        // Centered Ineffa TCG Avatar Icon
         const avatar = document.createElement('img');
-        avatar.src = 'https://static.wikia.nocookie.net/gensin-impact/images/6/67/Ineffa_Side_Icon.png/revision/latest?cb=20250730090609';
+        avatar.src = 'https://static.wikia.nocookie.net/gensin-impact/images/3/3f/Ineffa_TCG_Avatar_Icon.png/revision/latest/scale-to-width-down/250?cb=20260306003556';
         avatar.setAttribute('referrerpolicy', 'no-referrer');
         avatar.alt = 'Ineffa';
-        avatar.className = 'w-7 h-7 rounded-full object-cover border border-indigo-500/40 -scale-x-100 mt-1 shadow';
+        avatar.className = 'w-8 h-8 rounded-full object-contain object-center border border-indigo-500/50 p-0.5 bg-zinc-900 mt-1 shadow flex-shrink-0';
 
         const bubble = document.createElement('div');
         bubble.className = 'bg-[#111113] border border-zinc-800 text-zinc-200 text-xs max-w-2xl rounded-2xl p-4 shadow-md leading-relaxed prose prose-invert prose-xs';
