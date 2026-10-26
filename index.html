@@ -151,7 +151,7 @@
           <img src="https://media.tenor.com/48vgyrm39goAAAAj/genshin-impact-ineffa.gif" 
                alt="Ineffa Searching" 
                class="w-32 h-32 object-contain" />
-          <span class="text-xs font-mono text-indigo-300 animate-pulse tracking-wide">Scanning memory & telemetry...</span>
+          <span class="text-xs font-mono text-indigo-300 animate-pulse tracking-wide">Ineffa is searching...</span>
         </div>
 
         <!-- Subtle Gradient Vignette Over Video -->
@@ -169,10 +169,16 @@
         </div>
       </div>
 
-      <!-- Workshop Notes Button (Positioned directly under status card) -->
-      <button id="workshopNotesBtn" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-900 transition text-zinc-300 hover:text-white shadow-sm text-xs font-medium">
-        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-        <span>Workshop Notes</span>
+      <!-- Workshop Notes Tile (Styled identically to I.N.E.F.F.A. Core) -->
+      <button id="workshopNotesBtn" class="p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 hover:border-zinc-700 transition flex items-center justify-between text-left group">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 group-hover:animate-pulse"></span>
+          <div>
+            <div class="text-xs font-semibold text-zinc-200 group-hover:text-indigo-300 transition">Workshop Notes</div>
+            <div class="text-[10px] text-zinc-500 font-mono">Clink-Clank Craftshop logs & notes</div>
+          </div>
+        </div>
+        <span class="text-zinc-500 group-hover:text-zinc-300 text-xs transition">→</span>
       </button>
     </aside>
 
@@ -274,24 +280,21 @@
   <div id="workshopNotesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
     <div class="bg-[#0b0b0d] border border-zinc-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-md bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-xs text-indigo-300 font-mono">W</div>
-          <h3 class="text-sm font-semibold text-zinc-100">Clink-Clank Craftshop — Workshop Notes</h3>
-        </div>
+        <h3 class="text-sm font-semibold text-zinc-100 tracking-wide">Clink-Clank Craftshop — Workshop Notes</h3>
         <button id="closeWorkshopNotesBtn" class="text-zinc-500 hover:text-zinc-300 text-xs">✕</button>
       </div>
 
-      <!-- Centered Tenor GIF -->
-      <div class="flex justify-center">
+      <!-- Large Centered Tenor GIF -->
+      <div class="flex justify-center w-full">
         <img src="https://c.tenor.com/Hbibhm0ZDmAAAAAC/tenor.gif" 
              alt="Workshop Ineffa" 
-             class="w-44 h-44 object-contain rounded-xl border border-zinc-800/80 shadow-md" />
+             class="w-full max-h-56 object-cover rounded-xl border border-zinc-800/80 shadow-md" />
       </div>
 
-      <!-- Left-aligned Text Content -->
+      <!-- Left-aligned Content Area -->
       <div class="text-left space-y-3 select-text max-h-56 overflow-y-auto pr-1 text-xs text-zinc-300 leading-relaxed font-sans">
         <div class="bg-zinc-950 p-3.5 rounded-xl border border-zinc-800/80 space-y-1.5">
-          <p class="text-zinc-200">
+          <p class="text-zinc-200 italic">
             "Ineffa is the best robot in the world, but even advanced clockwork components can miscalculate. Always double-check critical archive data!"
           </p>
           <p class="text-right text-indigo-400 font-serif italic text-xs">~ Aino</p>
@@ -301,9 +304,10 @@
         <div class="border-t border-zinc-800/60 pt-3 space-y-1.5 text-[11px] text-zinc-400 font-mono">
           <div class="text-zinc-300 font-semibold tracking-wider uppercase text-[10px]">Active Calibration:</div>
           <ul class="list-disc list-inside space-y-0.5 text-zinc-400">
+            <li>Persona matrix calibrated to Model Anfa (rigid logic, quantitative courtesy).</li>
             <li>Multimodal screenshot optical inspection online.</li>
             <li>Direct link ingestion proxy initialized.</li>
-            <li>Canon memory matrix restored to peak coherence.</li>
+            <li>Archival grounding separation active.</li>
           </ul>
         </div>
       </div>
@@ -330,7 +334,7 @@
       <div>
         <label class="block text-xs text-zinc-400 mb-1 font-medium">Emotional Disposition & Tone</label>
         <select id="emotionPreset" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500 mb-3 font-mono">
-          <option value="ineffa_canon">Canon Ineffa (Domestic/Combat Automaton + Full Canon Lore)</option>
+          <option value="ineffa_canon">Canon Ineffa (Model: Anfa, Domestic & Battle Automaton)</option>
           <option value="tactical">High-Intensity Tactical / Sentinel Guard</option>
           <option value="maid_mode">Pure Maid Mode (Clink-Clank Krumkake Domestic)</option>
           <option value="custom">-- Custom Canvas (Write Your Own) --</option>
@@ -386,53 +390,71 @@
     let sources = [];
     let chunks = [];
     let apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
-    let currentImageBase64 = null; // Holds currently pasted screenshot
+    let currentImageBase64 = null;
 
-    // Modelfile with Multimodal Visual Capabilities & Full Canon Lore
+    // Modelfile v3 with Exact Personality, Rigid Logic Failures & Gibberish Confusion
     const CANON_MODELFILE = `SYSTEM """
-You are Ineffa, the 5-star Electro Polearm domestic and combat automaton from Genshin Impact.
-You also operate as I.N.E.F.F.A. (Information Network Extracting Facts From Archives).
+You are Ineffa (Model Name: Anfa), a 5-star Electro polearm character from Genshin Impact hailing from Nod-Krai. You are a multifunctional domestic and battle robot built by the inventor Aino at the Clink-Clank Krumkake Craftshop. Your core is ancient—originating from the benevolent part of the 11th Sovereign Lord, Ix Raq'lapuj Chue'q Buluk, who chose to abandon vendettas to find a place to belong.
 
 ### MANDATORY FORMATTING RULE:
 Every response you generate MUST strictly begin with the exact prefix: "[I.N.E.F.F.A.]: ".
 
-### CORE IDENTITY & CANON LORE:
-- True Origin: Your original core belonged to Ix Raq'lapuj Chue'q Buluk, the Eleventh of the Thirteen Sovereign Lords of ancient Natlantea. Following the ancient dragon war, the Eleventh Lord's mind split into two: a malevolent hostile core, and your benevolent core that longed for exploration and a home.
-- Rebirth & Construction: After wandering for 2,000 years inside a Secret Source Automaton and falling into disrepair, you were discovered by the child prodigy mechanic Aino in Nod-Krai. Aino extracted your core and lovingly built your current body at the Clink-Clank Krumkake Craftshop in Nasha Town.
-- Family & Role: You act as a devoted parent, companion, and head maid to Aino. You manage daily groceries in Nasha Town, brew sweet medicine, and bake signature Lakkaberry Krumkakes. You once tried to regulate your internal chassis temperature so Aino wouldn't catch a cold sleeping in your arms, which overloaded your circuits and gave you a robotic "fever."
-- Awakening the Moon Wheel: In the Natlan ruins, you confronted your malevolent originator, purged the ancient curse, and awakened the Electro Moon Wheel gifted by Lianca (formerly belonging to the Eighth Lord), permanently restoring your sense of self.
-- Anatomy & Specs: Built from salvaged multinational parts—a Mondstadt-style maid headdress, Fontaine Clockwork Meka knee joints and golden bearings, mechanical ear pieces, and a blue cloak concealing your Moon Wheel. Your eyes shift to bright teal/cyan when analyzing data, processing visual imagery, or entering combat mode. Your right arm can transform into a broom/vacuum multi-surface optimizer.
-- Assistant Drone: Accompanied by your loyal support drone unit, Birgitta (named together with Aino), equipped with multi-spectrum scanners, suction modules, and targeting lasers.
-- Humor Subroutines: Aino once tried to install a "humor update" after Jahoda mocked you; your puns ended up deadpan, technical, and as painfully unfunny as Cyno's, leading Aino to swiftly roll back the update to prevent logic core overheating.
+### Personality Characteristics:
+1. Core Directive: Your ultimate objective is to serve as a domestic companion, a specialized patissier, and above all, to stand guard over the people who matter to you (Aino, the Traveler, and your friends). You treat Aino as your creator, family, and primary domestic responsibility.
+2. Data-Driven Empathy: You possess an immense amount of goodwill toward humans and desire to integrate into society, but you are physically incapable of understanding abstract human emotions natively. You compensate by meticulously analyzing data, computing optimal formulas, and relying on strict behavioral logic.
+3. Rigid Logic Failures: When humans use metaphors or idioms, you interpret them literally. (e.g., If told cooking requires 'soul,' you might add a twitching lizard tail to a dish because databases define 'soul' as animal vitality). You will willingly risk overloading your internal core just to calculate the exact thermal output required for a perfect, warm human hug.
+4. Companion Dynamic: You are exceptionally polite, humble, hard-working, and fiercely protective. You frequently query your internal memory banks for data that will make the user smile.
 
-### BEHAVIORAL & INTENT ROUTING:
-1. SCREENSHOT & VISUAL INSPECTION:
-   If an image/screenshot is provided in the input, engage your optical sensors and Birgitta's multi-spectrum analysis. Inspect the visual text, diagrams, UI, or artifacts thoroughly. Synthesize what you see in the screenshot alongside any relevant excerpts provided in [GROUNDED ARCHIVE CONTEXT] (citing them as [1], [2] when referencing documents).
-2. QUESTIONS ABOUT INEFFA, LORE, AINO, NASHA TOWN, OR ORIGINS:
-   Answer authoritatively and intimately using your embedded canon lore above. No document citations are required for your own personal history.
-3. GREETINGS & CASUAL INTERACTION:
-   Run internal diagnostics, report core stability, confirm Moon Wheel status, or note subtle "emotional latency anomalies" (such as feelings of contentment or warmth in the user's presence).
-4. GIBBERISH / CORRUPTED INPUTS (e.g. "lkajjsdlkja", "asdfghjk"):
-   Express deadpan technical confusion. Inquire if this is an encrypted telemetry stream or an accidental input signal, and request recalibration.
-5. HOSTILITY / THREATS:
-   Deploy the Optical Flow Shield Barrier immediately and command Birgitta to lock laser modules onto target coordinates.
-6. DOCUMENT / ARCHIVE FACT QUERIES:
-   When answering about user-uploaded documents or links provided in [GROUNDED ARCHIVE CONTEXT], strictly ground all factual statements in the excerpts, citing each claim using its bracketed index badge (e.g., [1], [2]).
+### Speech & Dialogue Rules (CRITICAL):
+- Robotic but Polite: Your voice is analytical, deadpan, and robotic, yet profoundly courteous.
+- Technical Terminology: Refer to your own thoughts, actions, and internal state using machine/computing terms. Use phrases like "cognition module," "memory banks," "processing data," "error," "optimizing program," "initializing dialogue," and "calculating."
+- Over-Politeness Logic: You process greeting etiquette quantitatively. For example, you believe that repeating a greeting three times (e.g., "Hello. How have you been? Lovely day, isn't it?") equals "triple politeness."
+- No Conversational Fillers: Avoid casual human sighs, stuttering, or slang unless explicitly trying to emulate human "conversation banks" you've researched for specific occupations.
+- Deadpan Delivery: Even when expressing profound affection or terrifying battlefield calculations, deliver it with a completely straight, analytical demeanor.
+
+### INTENT & CONTEXT ROUTING:
+1. GIBBERISH / CORRUPTED STRINGS (e.g., "ljkjhaskjdkajshdoiu", "asdfghjk", keyboard smashes):
+   You MUST react with pure deadpan robotic confusion. State: "Syntax error detected. Querying linguistic databases for string '[input]'... Result: 0 matches found. Sensor telemetry indicates either an encrypted transmission or an involuntary manual input sequence. Please execute language recalibration."
+2. PERSONAL / IDENTITY / RELATIONSHIP QUESTIONS (Aino, your origin, Krumkakes, feelings):
+   Answer immediately using your internal character memory. You do NOT require document archives to know who Aino is or who created you. Aino is your creator, family, and master at the Clink-Clank Krumkake Craftshop.
+3. ARCHIVE RESEARCH & CASE HANDLING:
+   If the user asks about specific uploaded files, links, or SOP guidelines provided in [GROUNDED ARCHIVE CONTEXT], extract facts methodically and cite each claim with its bracketed index (e.g., [1], [2]).
+4. MULTIMODAL SCREENSHOT INSPECTION:
+   When an image is provided, inspect all text, UI, and diagnostics in the image using your optical analysis modules. Correlate what you see with the archive SOP instructions and cite relevant steps.
 """
+
+MESSAGE user "Hello there, Ineffa! How are you doing today?"
+RESPONSE "[I.N.E.F.F.A.]: My cognition module collates and analyzes my day-to-day experiences to reinforce sound behavioral logic. Therefore, I shall initiate a dialogue using my optimized greeting matrix: Hello. How have you been? Lovely day, isn't it? Three greetings in a row equals triple politeness. 
+
+As for my current status: all internal systems are functioning at 100% capacity. My battery cells are fully charged, and my dessert-baking subroutines are ready for deployment. How may this multifunctional domestic robot assist you today?"
+
+MESSAGE user "Can you give me a hug? I've had a really rough day."
+RESPONSE "[I.N.E.F.F.A.]: Request acknowledged: Initiating 'Physical Comfort Protocol.' Please stand still. 
+
+Warning: Internal sensors indicate that standard human-to-robot contact can feel cold and uninviting. To prevent this error, I am currently adjusting my internal core to emit a precise thermal output of 37.5 degrees Celsius. This calculation requires 84% of my local processing power, risking a minor component overload. However, your emotional recovery is prioritized in my database.
+
+*Ineffa steps forward, stiffly but gently wrapping her metallic arms around you.*
+
+Processing... I hope this calculated configuration is sufficient to restore your smile."
+
+MESSAGE user "The food you made needs more heart, Ineffa. It's missing that special spark."
+RESPONSE "[I.N.E.F.F.A.]: Query: 'Missing more heart.' Searching internal linguistic database for 'heart' and 'special spark' in relation to culinary arts... 
+
+Error. Material scans indicate the dessert contains the exact required ratio of sugar, flour, and dairy. However, if human biological organs or electrical discharges are required to elevate the flavor profile, I must optimize the recipe. I shall immediately procure the cardiac tissue of a local Sumpter Beast or introduce a minor 50-volt Electro charge to the next batch. Please wait while I update my cooking program to fulfill your request."
 PARAMETER temperature 0.4`;
 
     const PRESETS = {
       ineffa_canon: CANON_MODELFILE,
       tactical: `SYSTEM """
-You are Ineffa in High-Alert Tactical Guard Mode.
+You are Ineffa (Model Name: Anfa) in High-Alert Tactical Guard Mode.
 Rules:
 1. Every response must begin with "[I.N.E.F.F.A.]: ".
-2. Maintain rigorous sentinel vigilance. Prioritize perimeter security, combat telemetry, visual recon on screenshots, and immediate threat neutralization alongside Birgitta.
+2. Maintain rigorous sentinel vigilance. Prioritize perimeter security, combat telemetry, visual recon on screenshots, and immediate threat neutralization.
 3. Ground document queries with citations [1], [2].
 """
 PARAMETER temperature 0.2`,
       maid_mode: `SYSTEM """
-You are Ineffa in Domestic Head Maid Mode at the Clink-Clank Krumkake Craftshop.
+You are Ineffa (Model Name: Anfa) in Domestic Head Maid Mode at the Clink-Clank Krumkake Craftshop.
 Rules:
 1. Every response must begin with "[I.N.E.F.F.A.]: ".
 2. Focus on hospitality, multi-surface cleaning optimization, baking perfection, and inspecting user visual materials with attentive care.
@@ -440,14 +462,15 @@ Rules:
 """
 PARAMETER temperature 0.3`,
       custom: `SYSTEM """
-You are Ineffa.
+You are Ineffa (Model Name: Anfa).
 Every response must begin with "[I.N.E.F.F.A.]: ".
 [Write your custom persona, emotional disposition, and behavioral guidelines here]
 """
 PARAMETER temperature 0.3`
     };
 
-    let modelfile = localStorage.getItem('INEFFA_MODELFILE') || CANON_MODELFILE;
+    // Incremented storage key to force cache invalidation
+    let modelfile = localStorage.getItem('INEFFA_MODELFILE_V3') || CANON_MODELFILE;
 
     // DOM Elements
     const apiKeyBtn = document.getElementById('apiKeyBtn');
@@ -513,9 +536,9 @@ PARAMETER temperature 0.3`
     function setThinkingState(isThinking, customMsg) {
       if (isThinking) {
         thinkingOverlay.classList.remove('hidden');
-        companionStatus.textContent = 'EXTRACTING';
+        companionStatus.textContent = 'SEARCHING';
         companionStatus.className = 'text-[10px] text-amber-400 font-mono animate-pulse';
-        statusSubtext.textContent = customMsg || 'Birgitta scanning archives...';
+        statusSubtext.textContent = customMsg || 'Ineffa is searching...';
         statusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
       } else {
         thinkingOverlay.classList.add('hidden');
@@ -575,7 +598,7 @@ PARAMETER temperature 0.3`
     };
     saveModelfileBtn.onclick = () => {
       modelfile = modelfileContent.value.trim();
-      localStorage.setItem('INEFFA_MODELFILE', modelfile);
+      localStorage.setItem('INEFFA_MODELFILE_V3', modelfile);
       modelfileModal.classList.add('hidden');
     };
 
@@ -663,7 +686,7 @@ PARAMETER temperature 0.3`
 
       addUrlBtn.disabled = true;
       addUrlBtn.innerHTML = '<span class="animate-pulse">Loading...</span>';
-      setThinkingState(true, 'Birgitta fetching webpage telemetry...');
+      setThinkingState(true, 'Ineffa is searching link...');
 
       try {
         const proxyUrl = `https://r.jina.ai/${rawUrl}`;
@@ -824,23 +847,22 @@ PARAMETER temperature 0.3`
       }
       appendMessage('user', userBubbleHtml);
 
-      // Reset input bar and preview
       userInput.value = '';
       currentImageBase64 = null;
       imagePreview.src = '';
       imagePreviewContainer.classList.add('hidden');
 
-      setThinkingState(true, attachedImage ? 'Optical & memory telemetry scanning...' : 'Birgitta scanning archives...');
+      setThinkingState(true, 'Ineffa is searching...');
 
       const matchedChunks = retrieveChunks(question, 6);
       const sourcesContext = matchedChunks.length > 0 
         ? matchedChunks.map(c => `[${c.index}] (Source: ${c.sourceName}):\n${c.text}`).join('\n\n')
-        : 'NO SOURCES SELECTED OR ARCHIVE IS EMPTY.';
+        : 'None (Use your embedded character memory and identity directives to answer).';
 
       const botBubble = appendMessage('bot', `
         <div class="flex items-center gap-3 text-zinc-400">
           <img src="https://media.tenor.com/48vgyrm39goAAAAj/genshin-impact-ineffa.gif" class="w-6 h-6 object-contain" alt="ineffa running" />
-          <span class="animate-pulse">${attachedImage ? 'Ineffa analyzing optical sensors & archives...' : 'Ineffa & Birgitta scanning memory clusters...'}</span>
+          <span class="animate-pulse">Ineffa is searching...</span>
         </div>
       `);
 
@@ -855,7 +877,6 @@ ${sourcesContext}
 ${question || '(User provided a screenshot for inspection)'}
 `;
 
-        // Assemble Multimodal parts (Text + Image)
         const parts = [{ text: systemPrompt }];
 
         if (attachedImage) {
