@@ -168,16 +168,36 @@
           </div>
         </div>
       </div>
+
+      <!-- Workshop Notes Button (Positioned directly under status card) -->
+      <button id="workshopNotesBtn" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-900 transition text-zinc-300 hover:text-white shadow-sm text-xs font-medium">
+        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+        <span>Workshop Notes</span>
+      </button>
     </aside>
 
     <!-- CENTER PANEL: Grounded Chat Workspace -->
     <section class="flex-1 flex flex-col bg-[#050505]">
-      <!-- Chat history area -->
+      <!-- Chat history area with Clean Character Title Banner -->
       <div id="chatHistory" class="flex-1 overflow-y-auto p-6 space-y-5 select-text">
-        <div class="max-w-xl mx-auto text-center py-20 text-zinc-500 space-y-3">
-          <p class="text-sm text-zinc-200 font-medium">Archive & Optical Systems Ready</p>
-          <p class="text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">
-            Upload files/links, or paste (<kbd class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">Ctrl + V</kbd>) screenshots directly into the chatbox for Ineffa's inspection.
+        <div class="max-w-xl mx-auto flex flex-col items-center justify-center py-20 text-center select-none">
+          <!-- Ineffa TCG Avatar Icon -->
+          <img src="https://static.wikia.nocookie.net/gensin-impact/images/3/3f/Ineffa_TCG_Avatar_Icon.png/revision/latest/scale-to-width-down/250?cb=20260306003556" 
+               alt="Ineffa Avatar" 
+               referrerpolicy="no-referrer"
+               class="w-20 h-20 rounded-full object-cover border-2 border-indigo-500/60 shadow-xl shadow-indigo-600/10 mb-3" />
+          
+          <!-- Ineffa Name -->
+          <h2 class="text-xl font-bold tracking-wider text-zinc-100 uppercase">I.N.E.F.F.A.</h2>
+          
+          <!-- Ineffa Catchphrase -->
+          <p class="text-xs text-indigo-300 font-medium tracking-wide mt-1.5 italic">
+            "White Iron Forged the Body, Crimson Heart Cast the Soul"
+          </p>
+          
+          <!-- Subtitle / Role -->
+          <p class="text-[11px] text-zinc-500 tracking-normal mt-1 font-mono">
+            Multifunctional Robot for Domestic Application — ready to assist.
           </p>
         </div>
       </div>
@@ -249,6 +269,52 @@
     </aside>
 
   </main>
+
+  <!-- Workshop Notes & Disclaimer Modal -->
+  <div id="workshopNotesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-[#0b0b0d] border border-zinc-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-md bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-xs text-indigo-300 font-mono">W</div>
+          <h3 class="text-sm font-semibold text-zinc-100">Clink-Clank Craftshop — Workshop Notes</h3>
+        </div>
+        <button id="closeWorkshopNotesBtn" class="text-zinc-500 hover:text-zinc-300 text-xs">✕</button>
+      </div>
+
+      <!-- Centered Tenor GIF -->
+      <div class="flex justify-center">
+        <img src="https://c.tenor.com/Hbibhm0ZDmAAAAAC/tenor.gif" 
+             alt="Workshop Ineffa" 
+             class="w-44 h-44 object-contain rounded-xl border border-zinc-800/80 shadow-md" />
+      </div>
+
+      <!-- Left-aligned Text Content -->
+      <div class="text-left space-y-3 select-text max-h-56 overflow-y-auto pr-1 text-xs text-zinc-300 leading-relaxed font-sans">
+        <div class="bg-zinc-950 p-3.5 rounded-xl border border-zinc-800/80 space-y-1.5">
+          <p class="text-zinc-200">
+            "Ineffa is the best robot in the world, but even advanced clockwork components can miscalculate. Always double-check critical archive data!"
+          </p>
+          <p class="text-right text-indigo-400 font-serif italic text-xs">~ Aino</p>
+        </div>
+
+        <!-- Future Version / Patch Notes Section -->
+        <div class="border-t border-zinc-800/60 pt-3 space-y-1.5 text-[11px] text-zinc-400 font-mono">
+          <div class="text-zinc-300 font-semibold tracking-wider uppercase text-[10px]">Active Calibration:</div>
+          <ul class="list-disc list-inside space-y-0.5 text-zinc-400">
+            <li>Multimodal screenshot optical inspection online.</li>
+            <li>Direct link ingestion proxy initialized.</li>
+            <li>Canon memory matrix restored to peak coherence.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-zinc-800/80">
+        <button id="ackWorkshopNotesBtn" class="px-4 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition shadow-md shadow-indigo-600/20">
+          Understood
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modelfile Editor Modal -->
   <div id="modelfileModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
@@ -399,6 +465,11 @@ PARAMETER temperature 0.3`
     const statusSubtext = document.getElementById('statusSubtext');
     const statusDot = document.getElementById('statusDot');
 
+    const workshopNotesBtn = document.getElementById('workshopNotesBtn');
+    const workshopNotesModal = document.getElementById('workshopNotesModal');
+    const closeWorkshopNotesBtn = document.getElementById('closeWorkshopNotesBtn');
+    const ackWorkshopNotesBtn = document.getElementById('ackWorkshopNotesBtn');
+
     const fileInput = document.getElementById('fileInput');
     const urlForm = document.getElementById('urlForm');
     const urlInput = document.getElementById('urlInput');
@@ -479,6 +550,12 @@ PARAMETER temperature 0.3`
       apiModal.classList.add('hidden');
     };
 
+    // Workshop Notes Handlers
+    workshopNotesBtn.onclick = () => workshopNotesModal.classList.remove('hidden');
+    closeWorkshopNotesBtn.onclick = () => workshopNotesModal.classList.add('hidden');
+    ackWorkshopNotesBtn.onclick = () => workshopNotesModal.classList.add('hidden');
+    workshopNotesModal.onclick = (e) => { if (e.target === workshopNotesModal) workshopNotesModal.classList.add('hidden'); };
+
     // Modelfile Handlers
     modelfileBtn.onclick = () => {
       modelfileContent.value = modelfile;
@@ -513,7 +590,7 @@ PARAMETER temperature 0.3`
           const file = item.getAsFile();
           const reader = new FileReader();
           reader.onload = (event) => {
-            currentImageBase64 = event.target.result; // data:image/png;base64,...
+            currentImageBase64 = event.target.result;
             imagePreview.src = currentImageBase64;
             imagePreviewContainer.classList.remove('hidden');
           };
