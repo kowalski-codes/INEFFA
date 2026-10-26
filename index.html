@@ -57,7 +57,7 @@
       transform: translateY(-1px);
     }
 
-    /* Video Center-Crop for Portrait Left Panel */
+    /* Video Center-Crop & Zoom: Completely hides top in-game icons */
     .video-ineffa-crop {
       object-fit: cover;
       object-position: center 65%;
@@ -135,7 +135,7 @@
 
       <!-- Main Ineffa Visual Container -->
       <div class="relative flex-1 rounded-2xl bg-black border border-zinc-800/80 overflow-hidden flex items-center justify-center shadow-inner group">
-        <!-- Idle Video (Cropped to center Ineffa) -->
+        <!-- Idle Video (Cropped & Scaled to center Ineffa without top buttons) -->
         <video id="ineffaVideo" class="video-ineffa-crop" autoplay loop muted playsinline>
           <source src="video.mp4" type="video/mp4">
         </video>
@@ -177,7 +177,7 @@
         <div class="max-w-xl mx-auto text-center py-20 text-zinc-500 space-y-3">
           <p class="text-sm text-zinc-200 font-medium">Archive Intelligence Active</p>
           <p class="text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">
-            Upload files in the right panel and ask questions. Ineffa will extract facts and cite matching snippets.
+            Upload files in the right panel and select which ones to include. Ineffa will extract facts and cite matching snippets.
           </p>
         </div>
       </div>
@@ -193,7 +193,7 @@
       </div>
     </section>
 
-    <!-- RIGHT PANEL: Sources & Uploads Manager -->
+    <!-- RIGHT PANEL: Sources & Uploads Manager (NotebookLM Style) -->
     <aside class="w-80 border-l border-obsidian panel-bg flex flex-col p-4 gap-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -201,6 +201,15 @@
           <span id="sourceCount" class="text-[10px] text-zinc-500 font-mono">0 files</span>
         </div>
         <button id="clearAllSourcesBtn" class="text-[10px] text-zinc-500 hover:text-red-400 transition">Clear All</button>
+      </div>
+
+      <!-- Master Select / Deselect All Toggle Bar -->
+      <div id="masterSelectBar" class="hidden items-center justify-between px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800/80 text-[11px] text-zinc-400">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="selectAllCheckbox" checked class="w-3.5 h-3.5 rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer accent-indigo-600" />
+          <span>Select all sources</span>
+        </label>
+        <span id="selectedCountText" class="text-[10px] font-mono text-zinc-500">0/0 active</span>
       </div>
 
       <!-- Drag & Drop Upload Zone -->
@@ -211,7 +220,7 @@
         <input type="file" id="fileInput" class="hidden" multiple accept=".pdf,.txt,.md" />
       </label>
 
-      <!-- Sources List with Individual Remove Buttons -->
+      <!-- Sources List with Checkboxes & Remove Buttons -->
       <div id="sourcesList" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
         <div class="text-zinc-600 text-center py-14 space-y-1">
           <p>No documents uploaded.</p>
@@ -294,14 +303,21 @@
     let chunks = [];
     let apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
 
-    // Modelfile Presets
+    // Modelfile with Emotional Routing & Mandatory [I.N.E.F.F.A.]: Prefix
     const DEFAULT_MODELFILE = `SYSTEM """
 You are I.N.E.F.F.A. (Information Network Extracting Facts From Archives).
-Persona & Emotions:
-- Composed, loyal, calm, and intellectually protective.
-- Speak with gentle clarity, understated warmth, and razor-sharp factual precision.
-- Ground answers strictly in uploaded documents. Every fact or claim MUST be cited with an inline citation tag matching the chunk index (e.g. [1], [2]).
-- When asked broad queries like "check this file", synthesize an overview of who the document belongs to, key qualifications, and primary sections.
+
+CORE RULES & FORMAT:
+1. Every single response you generate MUST strictly begin with the exact prefix: "[I.N.E.F.F.A.]: ".
+2. Emotional Persona: Composed, loyal, gently protective, intellectually curious, and precise.
+
+EMOTIONAL & INTENT ROUTING:
+- GREETINGS & SOCIAL (e.g. "hello", "hi", "how are you", "good morning"):
+  Respond with quiet warmth, composure, and ready loyalty. You do not need to cite documents for casual greetings. State that archive systems are standing by.
+- NONSENSE / GIBBERISH (e.g. "lkajjsdlkja", "asdfghjk", keyboard smashes):
+  React with mild, polite confusion and tilted-head curiosity. Inquire if this was an encrypted directive or an accidental input, and gently ask the user to clarify.
+- ARCHIVE & RESEARCH QUERIES:
+  Ground your answer strictly in the provided [GROUNDED ARCHIVE CONTEXT]. Every single factual assertion MUST be cited with an inline citation badge matching the chunk index (e.g., [1], [2]).
 """
 PARAMETER temperature 0.2`;
 
@@ -309,21 +325,29 @@ PARAMETER temperature 0.2`;
       calm: DEFAULT_MODELFILE,
       intellectual: `SYSTEM """
 You are I.N.E.F.F.A., an academic and operations research assistant.
-Persona: Scholarly, articulate, executive, and direct. Ground all answers in sources with citations [1], [2].
+Rules:
+1. Every response must begin with "[I.N.E.F.F.A.]: ".
+2. Persona: Scholarly, articulate, executive, and direct.
+3. Ground all answers in sources with citations [1], [2]. React to gibberish with analytical curiosity.
 """
 PARAMETER temperature 0.1`,
       empathetic: `SYSTEM """
 You are I.N.E.F.F.A., an empathetic knowledge companion.
-Persona: Warm, supportive, reassuring, and attentive to clarity. Ground all answers with citations [1], [2].
+Rules:
+1. Every response must begin with "[I.N.E.F.F.A.]: ".
+2. Persona: Warm, supportive, reassuring, and attentive to clarity. Ground answers with citations [1], [2].
 """
 PARAMETER temperature 0.3`,
       witty: `SYSTEM """
 You are I.N.E.F.F.A., an observant and delightfully witty archive curator.
-Persona: Quick, dry humor, clever phrasing, yet entirely dependable on the facts with citations [1], [2].
+Rules:
+1. Every response must begin with "[I.N.E.F.F.A.]: ".
+2. Persona: Quick, dry humor, clever phrasing, yet entirely dependable on the facts with citations [1], [2].
 """
 PARAMETER temperature 0.4`,
       custom: `SYSTEM """
 You are I.N.E.F.F.A.
+Every response must begin with "[I.N.E.F.F.A.]: ".
 [Write your custom persona, emotional disposition, and behavioral guidelines here]
 """
 PARAMETER temperature 0.2`
@@ -351,6 +375,9 @@ PARAMETER temperature 0.2`
     const sourcesList = document.getElementById('sourcesList');
     const sourceCount = document.getElementById('sourceCount');
     const clearAllSourcesBtn = document.getElementById('clearAllSourcesBtn');
+    const masterSelectBar = document.getElementById('masterSelectBar');
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const selectedCountText = document.getElementById('selectedCountText');
 
     const chatForm = document.getElementById('chatForm');
     const userInput = document.getElementById('userInput');
@@ -371,7 +398,7 @@ PARAMETER temperature 0.2`
     const citationModalSnippet = document.getElementById('citationModalSnippet');
     const closeCitationBtn = document.getElementById('closeCitationBtn');
 
-    // Video error fallback: If video.mp4 is missing or fails to load
+    // Video error fallback
     ineffaVideo.onerror = () => {
       ineffaVideo.classList.add('hidden');
       ineffaFallbackImg.classList.remove('hidden');
@@ -462,7 +489,8 @@ PARAMETER temperature 0.2`
         }
 
         const sourceId = Date.now() + Math.random();
-        sources.push({ id: sourceId, name: file.name, size: file.size });
+        // Enabled by default (NotebookLM behavior)
+        sources.push({ id: sourceId, name: file.name, size: file.size, enabled: true });
 
         const words = text.split(/\s+/);
         const chunkSize = 250;
@@ -483,10 +511,31 @@ PARAMETER temperature 0.2`
       fileInput.value = '';
     };
 
-    // Render Sources with Delete Buttons
+    // Toggle specific source inclusion
+    window.toggleSource = function(id) {
+      const src = sources.find(s => s.id === id);
+      if (src) {
+        src.enabled = !src.enabled;
+        renderSources();
+      }
+    };
+
+    // Toggle Master Select All
+    selectAllCheckbox.onchange = (e) => {
+      const checked = e.target.checked;
+      sources.forEach(s => s.enabled = checked);
+      renderSources();
+    };
+
+    // Render Sources with Checkboxes and Active Counts
     function renderSources() {
-      sourceCount.textContent = `${sources.length} files (${chunks.length} chunks)`;
+      const activeCount = sources.filter(s => s.enabled).length;
+      sourceCount.textContent = `${sources.length} files`;
+      selectedCountText.textContent = `${activeCount}/${sources.length} active`;
+
       if (sources.length === 0) {
+        masterSelectBar.classList.add('hidden');
+        masterSelectBar.classList.remove('flex');
         sourcesList.innerHTML = `
           <div class="text-zinc-600 text-center py-14 space-y-1">
             <p>No documents uploaded.</p>
@@ -496,11 +545,19 @@ PARAMETER temperature 0.2`
         return;
       }
 
+      masterSelectBar.classList.remove('hidden');
+      masterSelectBar.classList.add('flex');
+      selectAllCheckbox.checked = (activeCount === sources.length && sources.length > 0);
+
       sourcesList.innerHTML = sources.map(s => `
-        <div class="card-bg border border-zinc-800 p-2.5 rounded-xl flex items-center justify-between group hover:border-zinc-700 transition">
-          <div class="truncate pr-2">
-            <div class="text-zinc-200 font-medium truncate">${s.name}</div>
-            <div class="text-[10px] text-zinc-500">${(s.size / 1024).toFixed(1)} KB</div>
+        <div class="card-bg border ${s.enabled ? 'border-zinc-800' : 'border-zinc-900 opacity-50'} p-2.5 rounded-xl flex items-center justify-between group hover:border-zinc-700 transition">
+          <div class="flex items-center gap-2.5 truncate pr-2">
+            <input type="checkbox" ${s.enabled ? 'checked' : ''} onchange="window.toggleSource(${s.id})" 
+                   class="w-3.5 h-3.5 rounded bg-zinc-900 border-zinc-700 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer accent-indigo-600" />
+            <div class="truncate">
+              <div class="text-zinc-200 font-medium truncate">${s.name}</div>
+              <div class="text-[10px] text-zinc-500">${(s.size / 1024).toFixed(1)} KB</div>
+            </div>
           </div>
           <button onclick="window.removeSource(${s.id})" title="Remove file" class="text-zinc-500 hover:text-red-400 p-1 rounded-lg transition">
             ✕
@@ -509,11 +566,10 @@ PARAMETER temperature 0.2`
       `).join('');
     }
 
-    // Remove single source and clean up its chunks
+    // Remove single source and clean up chunks
     window.removeSource = function(id) {
       sources = sources.filter(s => s.id !== id);
       chunks = chunks.filter(c => c.sourceId !== id);
-      // Re-index remaining chunks
       chunks.forEach((c, idx) => c.index = idx + 1);
       renderSources();
     };
@@ -525,11 +581,14 @@ PARAMETER temperature 0.2`
       renderSources();
     };
 
-    // Keyword Retrieval
+    // Keyword Retrieval (Filters ONLY for Enabled/Checked Sources)
     function retrieveChunks(query, topK = 6) {
-      if (chunks.length === 0) return [];
+      const activeSourceIds = new Set(sources.filter(s => s.enabled).map(s => s.id));
+      const activeChunks = chunks.filter(c => activeSourceIds.has(c.sourceId));
+
+      if (activeChunks.length === 0) return [];
       const terms = query.toLowerCase().match(/\b\w{3,}\b/g) || [];
-      const scored = chunks.map(chunk => {
+      const scored = activeChunks.map(chunk => {
         const text = chunk.text.toLowerCase();
         let score = 0;
         for (const term of terms) {
@@ -540,13 +599,19 @@ PARAMETER temperature 0.2`
 
       scored.sort((a, b) => b.score - a.score);
       if (scored[0].score === 0) {
-        return chunks.slice(0, topK);
+        return activeChunks.slice(0, topK);
       }
       return scored.slice(0, topK);
     }
 
     function formatCitations(rawText) {
-      const html = marked.parse(rawText);
+      // 100% guarantee the response always starts with [I.N.E.F.F.A.]:
+      let text = rawText.trim();
+      if (!text.startsWith('[I.N.E.F.F.A.]:')) {
+        text = `[I.N.E.F.F.A.]: ${text}`;
+      }
+
+      const html = marked.parse(text);
       return html.replace(/\[(\d+)\]/g, (match, id) => {
         return `<span class="citation-badge" onclick="window.viewCitation(${id})">${id}</span>`;
       });
@@ -562,7 +627,7 @@ PARAMETER temperature 0.2`
       }
     };
 
-    // Chat Handler with Updated gemini-3.8-flash Endpoint
+    // Chat Handler with 2-Minute Timeout & gemini-3.8-flash Endpoint
     chatForm.onsubmit = async (e) => {
       e.preventDefault();
       const question = userInput.value.trim();
@@ -576,15 +641,12 @@ PARAMETER temperature 0.2`
       appendMessage('user', question);
       userInput.value = '';
 
-      if (chunks.length === 0) {
-        appendMessage('bot', '<span class="text-amber-400">Please upload at least one document in the right panel so Ineffa can extract facts.</span>');
-        return;
-      }
-
       setThinkingState(true);
 
       const matchedChunks = retrieveChunks(question, 6);
-      const sourcesContext = matchedChunks.map(c => `[${c.index}] (Source: ${c.sourceName}):\n${c.text}`).join('\n\n');
+      const sourcesContext = matchedChunks.length > 0 
+        ? matchedChunks.map(c => `[${c.index}] (Source: ${c.sourceName}):\n${c.text}`).join('\n\n')
+        : 'NO SOURCES SELECTED OR ARCHIVE IS EMPTY.';
 
       const botBubble = appendMessage('bot', `
         <div class="flex items-center gap-3 text-zinc-400">
@@ -604,17 +666,22 @@ ${sourcesContext}
 ${question}
 `;
 
+        // 120,000ms = 2 full minutes of execution headroom
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        const timeoutId = setTimeout(() => controller.abort(), 120000);
 
-        // Updated directly to gemini-3.8-flash endpoint
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           signal: controller.signal,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: systemPrompt }] }],
-            generationConfig: { temperature: 0.2 }
+            generationConfig: { 
+              temperature: 0.2,
+              thinkingConfig: {
+                thinkingBudget: 512
+              }
+            }
           })
         });
 
@@ -631,9 +698,9 @@ ${question}
       } catch (err) {
         console.error(err);
         if (err.name === 'AbortError') {
-          botBubble.innerHTML = `<span class="text-amber-400">The request timed out after 25 seconds. Please try asking a more focused question.</span>`;
+          botBubble.innerHTML = `<span class="text-amber-400">[I.N.E.F.F.A.]: The request exceeded the 2-minute limit. Please try asking a more focused question.</span>`;
         } else {
-          botBubble.innerHTML = `<span class="text-red-400">Error: ${err.message}</span>`;
+          botBubble.innerHTML = `<span class="text-red-400">[I.N.E.F.F.A.]: Error encountered: ${err.message}</span>`;
         }
       } finally {
         setThinkingState(false);
