@@ -1,2 +1,2 @@
-# INEFFA
-[I.N.E.F.F.A.]: Information Network Extracting Facts From Archives
+# [I.N.E.F.F.A.]:
+Information Network Extracting Facts From Archives
