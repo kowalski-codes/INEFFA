@@ -103,7 +103,7 @@
           I.N.E.F.F.A.
         </h1>
         <p class="text-[10px] text-zinc-400 font-mono tracking-tight">
-          [I.N.E.F.F.A.]: Information Network Extracting Facts From Archives
+          [I.N.E.F.F.A.]: Information Network Extracting Facts From Archives (Local Engine)
         </p>
       </div>
     </div>
@@ -115,10 +115,10 @@
         <span>Modelfile</span>
       </button>
 
-      <!-- API Key Setting -->
-      <button id="apiKeyBtn" class="flex items-center gap-2 text-xs px-3.5 py-1.5 rounded-lg border border-zinc-700/80 bg-zinc-900/90 hover:bg-zinc-800 transition text-zinc-200 shadow-md">
-        <span id="keyStatusIndicator" class="w-2 h-2 rounded-full bg-amber-400"></span>
-        <span id="keyStatusText">API Key</span>
+      <!-- Ollama Core Status Button -->
+      <button id="ollamaStatusBtn" class="flex items-center gap-2 text-xs px-3.5 py-1.5 rounded-lg border border-zinc-700/80 bg-zinc-900/90 hover:bg-zinc-800 transition text-zinc-200 shadow-md">
+        <span id="ollamaStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+        <span id="ollamaStatusText" class="font-mono text-[11px]">Connecting Ollama...</span>
       </button>
     </div>
   </header>
@@ -135,12 +135,12 @@
 
       <!-- Main Ineffa Visual Container -->
       <div class="relative flex-1 rounded-2xl bg-black border border-zinc-800/80 overflow-hidden flex items-center justify-center shadow-inner group">
-        <!-- Idle Video (Cropped & Scaled to center Ineffa without top buttons) -->
+        <!-- Idle Video -->
         <video id="ineffaVideo" class="video-ineffa-crop" autoplay loop muted playsinline>
           <source src="video.mp4" type="video/mp4">
         </video>
 
-        <!-- Idle Image Fallback in case video is pending or loading -->
+        <!-- Idle Image Fallback -->
         <img id="ineffaFallbackImg" 
              src="https://media1.tenor.com/m/rFEqFDPF36sAAAAd/ineffa-spin-spineffa.gif" 
              alt="Ineffa Idle" 
@@ -151,7 +151,7 @@
           <img src="https://media.tenor.com/48vgyrm39goAAAAj/genshin-impact-ineffa.gif" 
                alt="Ineffa Searching" 
                class="w-32 h-32 object-contain" />
-          <span class="text-xs font-mono text-indigo-300 animate-pulse tracking-wide">Searching archives...</span>
+          <span class="text-xs font-mono text-indigo-300 animate-pulse tracking-wide">Querying llama3.2 locally...</span>
         </div>
 
         <!-- Subtle Gradient Vignette Over Video -->
@@ -164,7 +164,7 @@
           <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <div>
             <div class="text-xs font-semibold text-zinc-200">I.N.E.F.F.A. Core</div>
-            <div id="statusSubtext" class="text-[10px] text-zinc-500 font-mono">Monitoring queries</div>
+            <div id="statusSubtext" class="text-[10px] text-zinc-500 font-mono">llama3.2 offline engine</div>
           </div>
         </div>
       </div>
@@ -177,7 +177,7 @@
         <div class="max-w-xl mx-auto text-center py-20 text-zinc-500 space-y-3">
           <p class="text-sm text-zinc-200 font-medium">Archive Intelligence Active</p>
           <p class="text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">
-            Upload files in the right panel and select which ones to include. Ineffa will extract facts and cite matching snippets.
+            Running locally through Ollama (llama3.2). Upload your files, select which ones to query, and ask your questions.
           </p>
         </div>
       </div>
@@ -193,7 +193,7 @@
       </div>
     </section>
 
-    <!-- RIGHT PANEL: Sources & Uploads Manager (NotebookLM Style) -->
+    <!-- RIGHT PANEL: Sources & Uploads Manager -->
     <aside class="w-80 border-l border-obsidian panel-bg flex flex-col p-4 gap-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -280,28 +280,12 @@
     </div>
   </div>
 
-  <!-- API Key Modal -->
-  <div id="apiModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-    <div class="bg-[#0b0b0d] border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-      <h3 class="text-base font-semibold text-zinc-100 mb-1">Set Gemini API Key</h3>
-      <p class="text-xs text-zinc-400 mb-4 leading-relaxed">
-        Paste your Gemini API key below. It is stored exclusively in your browser's local storage.
-      </p>
-      
-      <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-xs text-zinc-100 mb-4 focus:outline-none focus:border-indigo-500 font-mono select-text" />
-      
-      <div class="flex justify-end gap-2">
-        <button id="closeModalBtn" class="px-4 py-2 text-xs text-zinc-400 hover:text-zinc-200">Cancel</button>
-        <button id="saveKeyBtn" class="px-4 py-2 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition">Save Key</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Core JavaScript Logic -->
   <script>
     let sources = [];
     let chunks = [];
-    let apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
+    const OLLAMA_MODEL = 'llama3.2';
+    const OLLAMA_HOST = 'http://localhost:11434';
 
     // Modelfile with Emotional Routing & Mandatory [I.N.E.F.F.A.]: Prefix
     const DEFAULT_MODELFILE = `SYSTEM """
@@ -356,13 +340,9 @@ PARAMETER temperature 0.2`
     let modelfile = localStorage.getItem('INEFFA_MODELFILE') || DEFAULT_MODELFILE;
 
     // DOM Elements
-    const apiKeyBtn = document.getElementById('apiKeyBtn');
-    const apiModal = document.getElementById('apiModal');
-    const apiKeyInput = document.getElementById('apiKeyInput');
-    const saveKeyBtn = document.getElementById('saveKeyBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const keyStatusIndicator = document.getElementById('keyStatusIndicator');
-    const keyStatusText = document.getElementById('keyStatusText');
+    const ollamaStatusBtn = document.getElementById('ollamaStatusBtn');
+    const ollamaStatusDot = document.getElementById('ollamaStatusDot');
+    const ollamaStatusText = document.getElementById('ollamaStatusText');
 
     const ineffaVideo = document.getElementById('ineffaVideo');
     const ineffaFallbackImg = document.getElementById('ineffaFallbackImg');
@@ -410,40 +390,36 @@ PARAMETER temperature 0.2`
         thinkingOverlay.classList.remove('hidden');
         companionStatus.textContent = 'EXTRACTING';
         companionStatus.className = 'text-[10px] text-amber-400 font-mono animate-pulse';
-        statusSubtext.textContent = 'Extracting facts from sources...';
+        statusSubtext.textContent = 'Querying local model...';
         statusDot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
       } else {
         thinkingOverlay.classList.add('hidden');
         companionStatus.textContent = 'STANDBY';
         companionStatus.className = 'text-[10px] text-indigo-400 font-mono';
-        statusSubtext.textContent = 'Monitoring queries';
+        statusSubtext.textContent = 'llama3.2 ready';
         statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
       }
     }
 
-    // Key UI
-    function updateKeyIndicator() {
-      if (apiKey) {
-        keyStatusIndicator.className = 'w-2 h-2 rounded-full bg-emerald-400';
-        keyStatusText.textContent = 'API Key Active';
-      } else {
-        keyStatusIndicator.className = 'w-2 h-2 rounded-full bg-amber-400';
-        keyStatusText.textContent = 'Set API Key';
+    // Ping Ollama Health
+    async function checkOllamaConnection() {
+      try {
+        const res = await fetch(`${OLLAMA_HOST}/api/tags`, { method: 'GET' });
+        if (res.ok) {
+          const data = await res.json();
+          const hasModel = data.models?.some(m => m.name.includes('llama3.2'));
+          ollamaStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+          ollamaStatusText.textContent = hasModel ? 'llama3.2 Online' : 'Ollama Online';
+          return true;
+        }
+      } catch (err) {
+        ollamaStatusDot.className = 'w-2 h-2 rounded-full bg-rose-500';
+        ollamaStatusText.textContent = 'Ollama Offline';
+        return false;
       }
     }
-    updateKeyIndicator();
-
-    apiKeyBtn.onclick = () => {
-      apiKeyInput.value = apiKey;
-      apiModal.classList.remove('hidden');
-    };
-    closeModalBtn.onclick = () => apiModal.classList.add('hidden');
-    saveKeyBtn.onclick = () => {
-      apiKey = apiKeyInput.value.trim();
-      localStorage.setItem('GEMINI_API_KEY', apiKey);
-      updateKeyIndicator();
-      apiModal.classList.add('hidden');
-    };
+    checkOllamaConnection();
+    ollamaStatusBtn.onclick = checkOllamaConnection;
 
     // Modelfile Handlers
     modelfileBtn.onclick = () => {
@@ -489,7 +465,6 @@ PARAMETER temperature 0.2`
         }
 
         const sourceId = Date.now() + Math.random();
-        // Enabled by default (NotebookLM behavior)
         sources.push({ id: sourceId, name: file.name, size: file.size, enabled: true });
 
         const words = text.split(/\s+/);
@@ -511,7 +486,6 @@ PARAMETER temperature 0.2`
       fileInput.value = '';
     };
 
-    // Toggle specific source inclusion
     window.toggleSource = function(id) {
       const src = sources.find(s => s.id === id);
       if (src) {
@@ -520,14 +494,12 @@ PARAMETER temperature 0.2`
       }
     };
 
-    // Toggle Master Select All
     selectAllCheckbox.onchange = (e) => {
       const checked = e.target.checked;
       sources.forEach(s => s.enabled = checked);
       renderSources();
     };
 
-    // Render Sources with Checkboxes and Active Counts
     function renderSources() {
       const activeCount = sources.filter(s => s.enabled).length;
       sourceCount.textContent = `${sources.length} files`;
@@ -566,7 +538,6 @@ PARAMETER temperature 0.2`
       `).join('');
     }
 
-    // Remove single source and clean up chunks
     window.removeSource = function(id) {
       sources = sources.filter(s => s.id !== id);
       chunks = chunks.filter(c => c.sourceId !== id);
@@ -574,14 +545,12 @@ PARAMETER temperature 0.2`
       renderSources();
     };
 
-    // Clear all sources
     clearAllSourcesBtn.onclick = () => {
       sources = [];
       chunks = [];
       renderSources();
     };
 
-    // Keyword Retrieval (Filters ONLY for Enabled/Checked Sources)
     function retrieveChunks(query, topK = 6) {
       const activeSourceIds = new Set(sources.filter(s => s.enabled).map(s => s.id));
       const activeChunks = chunks.filter(c => activeSourceIds.has(c.sourceId));
@@ -605,7 +574,6 @@ PARAMETER temperature 0.2`
     }
 
     function formatCitations(rawText) {
-      // 100% guarantee the response always starts with [I.N.E.F.F.A.]:
       let text = rawText.trim();
       if (!text.startsWith('[I.N.E.F.F.A.]:')) {
         text = `[I.N.E.F.F.A.]: ${text}`;
@@ -627,16 +595,11 @@ PARAMETER temperature 0.2`
       }
     };
 
-    // Chat Handler with 2-Minute Timeout & gemini-3.8-flash Endpoint
+    // Chat Handler routing directly to local Ollama
     chatForm.onsubmit = async (e) => {
       e.preventDefault();
       const question = userInput.value.trim();
       if (!question) return;
-
-      if (!apiKey) {
-        apiModal.classList.remove('hidden');
-        return;
-      }
 
       appendMessage('user', question);
       userInput.value = '';
@@ -651,11 +614,11 @@ PARAMETER temperature 0.2`
       const botBubble = appendMessage('bot', `
         <div class="flex items-center gap-3 text-zinc-400">
           <img src="https://media.tenor.com/48vgyrm39goAAAAj/genshin-impact-ineffa.gif" class="w-6 h-6 object-contain" alt="ineffa running" />
-          <span class="animate-pulse">Ineffa is indexing facts from sources...</span>
+          <span class="animate-pulse">Ineffa is indexing facts locally via llama3.2...</span>
         </div>
       `);
 
-try {
+      try {
         const fullPrompt = `
 ${modelfile}
 
@@ -669,13 +632,12 @@ ${question}
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 120000);
 
-        // Connect directly to local Ollama API
-        const response = await fetch('http://localhost:11434/api/generate', {
+        const response = await fetch(`${OLLAMA_HOST}/api/generate`, {
           method: 'POST',
           signal: controller.signal,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'llama3.2', // Change to 'qwen2.5:3b' or whatever model you downloaded
+            model: OLLAMA_MODEL,
             prompt: fullPrompt,
             stream: false,
             options: {
@@ -696,13 +658,14 @@ ${question}
       } catch (err) {
         console.error(err);
         if (err.name === 'AbortError') {
-          botBubble.innerHTML = `<span class="text-amber-400">[I.N.E.F.F.A.]: Local processing timed out. Try a shorter query.</span>`;
+          botBubble.innerHTML = `<span class="text-amber-400">[I.N.E.F.F.A.]: Local processing timed out.</span>`;
         } else {
-          botBubble.innerHTML = `<span class="text-red-400">[I.N.E.F.F.A.]: Could not reach Ollama. Make sure Ollama is running and OLLAMA_ORIGINS is set to *. (Error: ${err.message})</span>`;
+          botBubble.innerHTML = `<span class="text-red-400">[I.N.E.F.F.A.]: Could not connect to Ollama. Make sure Ollama is running and OLLAMA_ORIGINS is set. (Error: ${err.message})</span>`;
         }
       } finally {
         setThinkingState(false);
       }
+    };
 
     function appendMessage(role, htmlContent) {
       const wrapper = document.createElement('div');
